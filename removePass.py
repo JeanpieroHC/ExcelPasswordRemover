@@ -13,9 +13,7 @@ path = sys.argv[1]
 directorioArchivo=os.path.dirname(path)
 
 def descomprimir_archivo(archivo):
-    # Ruta del directorio donde se encuentra el archivo
-
-    
+  
     # Abre el archivo 
     with zipfile.ZipFile(archivo, 'r') as zip_ref:
         # Extrae todos los archivos al directorio
@@ -24,3 +22,22 @@ def descomprimir_archivo(archivo):
     print(f"Se ha descomprimido correctamente {archivo}")
     
 descomprimir_archivo(path)
+
+def desprotegerHojaExcel(path):
+    dirHpjas=path+"/excelArchives/xl/worksheets"
+    
+    archivos_xml=encontrar_archivos_xml(dirHpjas)
+    print("Archivos XML encontrados:")
+    for archivo in archivos_xml:
+        print(archivo)
+    
+def encontrar_archivos_xml(directorio):
+    # Obtener una lista de todos los archivos en el directorio
+    archivos = os.listdir(directorio)
+    
+    # Filtrar solo los archivos XML
+    archivos_xml = [archivo for archivo in archivos if archivo.endswith('.xml')]
+    
+    return archivos_xml
+
+desprotegerHojaExcel(directorioArchivo)
