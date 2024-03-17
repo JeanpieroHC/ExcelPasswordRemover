@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import zipfile
 import xml.etree.ElementTree as ET
@@ -105,3 +106,4 @@ def recomprimir_xlsx_xlsm(directorio):
 
 
 recomprimir_xlsx_xlsm(directorioArchivo)
+shutil.rmtree(directorioArchivo+"/excelArchives")
