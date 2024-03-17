@@ -20,7 +20,6 @@ def descomprimir_archivo(archivo):
         # Extrae todos los archivos al directorio
         zip_ref.extractall(directorioArchivo+"/excelArchives")
     
-    print(f"Se ha descomprimido correctamente {archivo}")
     
 descomprimir_archivo(path)
 
@@ -28,7 +27,6 @@ def desprotegerHojaExcel(path):
     dirHpjas=path+"/excelArchives/xl/worksheets"
     
     archivos_xml=encontrar_archivos_xml(dirHpjas)
-    ver_contenido_xml(dirHpjas+"/"+archivos_xml[0])
     nuevo_contenido = {
         './/{http://schemas.openxmlformats.org/spreadsheetml/2006/main}sheetProtection': '0'
     }
@@ -62,7 +60,6 @@ def ver_contenido_xml(archivo):
 # Función para cambiar el contenido de un archivo XML
 def cambiar_contenido_xml(archivo, nuevo_contenido):
     primer_elemento = next(iter(nuevo_contenido.items()))
-    print(primer_elemento)
     tree = ET.parse(archivo)
     root = tree.getroot()
     elemento_modificar=root.find(primer_elemento[0])
@@ -80,10 +77,33 @@ def cambiar_contenido_xml(archivo, nuevo_contenido):
         print(e)
     
     tree.write(archivo)
+    
+def desprotegerMacrosExcel(path):
+    pathMacro=path+"/excelArchives/xl/vbaProject.bin"
+    reemplazarContenidoEnArchBin(pathMacro,"DPB","DPX")
 
+    
+def verArchivoBinario(archivobin):
+    with open(archivobin, 'rb') as archivo:
+        # Lee todo el contenido del archivo binario
+        contenido = archivo.read()
+
+        # Imprime todo el contenido del archivo
+        print(contenido)
+def reemplazarContenidoEnArchBin(archivobin,texto,reemplazo):
+    with open(archivobin, 'rb') as archivo:
+        contenido = archivo.read()
+    contenido_modificado = contenido.replace(texto.encode(),reemplazo.encode())
+
+    # 3. Escribir el contenido modificado de vuelta al archivo binario
+    with open(archivobin, 'wb') as archivo_modificado:
+        archivo_modificado.write(contenido_modificado)
+        
 desprotegerHojaExcel(directorioArchivo)
 desprotegerLibroExcel(directorioArchivo)
+desprotegerMacrosExcel(directorioArchivo)
 
+    
 def recomprimir_xlsx_xlsm(directorio):
     # Nombre del archivo ZIP resultante
     nuevo_zip = os.path.join(directorio, 'nuevo_archivo.xlsm')
@@ -100,8 +120,6 @@ def recomprimir_xlsx_xlsm(directorio):
                 ruta_zip = os.path.relpath(ruta_archivo, directorio+"/excelArchives")
                 # Agrega el archivo al ZIP
                 zip_ref.write(ruta_archivo, ruta_zip)
-
-    print(f"Se ha recomprimido correctamente en {nuevo_zip}")
 
 
 
