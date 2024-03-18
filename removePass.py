@@ -3,6 +3,7 @@ import shutil
 import sys
 import zipfile
 import xml.etree.ElementTree as ET
+import xlwings as xw
 
 # Verificamos si se proporcionó la ruta
 if len(sys.argv) != 2 :
@@ -12,6 +13,7 @@ if len(sys.argv) != 2 :
 
 path = sys.argv[1]
 directorioArchivo=os.path.dirname(path)
+archiveName=os.path.splitext(os.path.basename(path))[0]
 
 def descomprimir_archivo(archivo):
   
@@ -98,20 +100,22 @@ def reemplazarContenidoEnArchBin(archivobin,texto,reemplazo):
     # 3. Escribir el contenido modificado de vuelta al archivo binario
     with open(archivobin, 'wb') as archivo_modificado:
         archivo_modificado.write(contenido_modificado)
-        
+
+    
 desprotegerHojaExcel(directorioArchivo)
 desprotegerLibroExcel(directorioArchivo)
 desprotegerMacrosExcel(directorioArchivo)
 
     
 def recomprimir_xlsx_xlsm(directorio):
+    nombreArchivoNuevo=archiveName+"-NOPASS.xlsm"
     # Nombre del archivo ZIP resultante
-    nuevo_zip = os.path.join(directorio, 'nuevo_archivo.xlsm')
+    nuevo_zip = os.path.join(directorio, nombreArchivoNuevo)
 
     # Abre un nuevo archivo ZIP en modo de escritura
     with zipfile.ZipFile(nuevo_zip, 'w') as zip_ref:
         # Recorre todos los archivos en el directorio
-        zip_ref.write(directorio+'/nuevo_archivo.xlsm', 'nuevo_archivo.xlsm')
+        zip_ref.write(directorio+'/'+nombreArchivoNuevo, nombreArchivoNuevo)
         for carpeta_actual, _, archivos in os.walk(directorio+"/excelArchives"):
             for archivo in archivos:
                 # Ruta completa del archivo a agregar al ZIP
@@ -122,6 +126,7 @@ def recomprimir_xlsx_xlsm(directorio):
                 zip_ref.write(ruta_archivo, ruta_zip)
 
 
+    
 
 recomprimir_xlsx_xlsm(directorioArchivo)
 shutil.rmtree(directorioArchivo+"/excelArchives")
