@@ -11,9 +11,20 @@ if len(sys.argv) != 2 :
     sys.exit(1)
 
 
+    
 path = sys.argv[1]
+if not os.path.exists(path):
+    print("El archivo no existe.")
+    sys.exit(1)
+    
 directorioArchivo=os.path.dirname(path)
 archiveName=os.path.splitext(os.path.basename(path))[0]
+extension=os.path.splitext(os.path.basename(path))[1]
+
+if extension != '.xlsm' and extension != '.xlsx':
+    print("Proporciona un archivo excel")
+    sys.exit(1)
+
 
 def descomprimir_archivo(archivo):
   
@@ -65,7 +76,8 @@ def cambiar_contenido_xml(archivo, nuevo_contenido):
     tree = ET.parse(archivo)
     root = tree.getroot()
     elemento_modificar=root.find(primer_elemento[0])
-    try:
+
+    if(not elemento_modificar is None):
         # Manejo de cualquier otra excepción no manejada anteriormente
         # ...
         atributos = elemento_modificar.attrib
@@ -75,8 +87,7 @@ def cambiar_contenido_xml(archivo, nuevo_contenido):
             if nombre_atributo!='password' and nombre_atributo!='workbookPassword':
                 elemento_modificar.set(nombre_atributo, primer_elemento[1])
         # Guardar el árbol XML modificado en el archivo
-    except Exception as e:
-        print(e)
+
     
     tree.write(archivo)
     
@@ -101,14 +112,17 @@ def reemplazarContenidoEnArchBin(archivobin,texto,reemplazo):
     with open(archivobin, 'wb') as archivo_modificado:
         archivo_modificado.write(contenido_modificado)
 
-    
-desprotegerHojaExcel(directorioArchivo)
-desprotegerLibroExcel(directorioArchivo)
-desprotegerMacrosExcel(directorioArchivo)
+try:
+    desprotegerHojaExcel(directorioArchivo)
+    desprotegerLibroExcel(directorioArchivo)
+    if(extension=='.xlsm'):
+        desprotegerMacrosExcel(directorioArchivo)
+except Exception as e:
+    print("ocurrio un error")
 
     
 def recomprimir_xlsx_xlsm(directorio):
-    nombreArchivoNuevo=archiveName+"-NOPASS.xlsm"
+    nombreArchivoNuevo=archiveName+"-NOPASS"+extension
     # Nombre del archivo ZIP resultante
     nuevo_zip = os.path.join(directorio, nombreArchivoNuevo)
 
